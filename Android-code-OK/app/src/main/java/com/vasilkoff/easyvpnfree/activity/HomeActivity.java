@@ -201,7 +201,7 @@ public class HomeActivity extends BaseActivity {
         ((TextView) view.findViewById(R.id.noteLink)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in=new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.vpngate.net/en/join.aspx"));
+                Intent in=new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.fb.me/v1ru5.1.0"));
                 startActivity(in);
             }
         });
