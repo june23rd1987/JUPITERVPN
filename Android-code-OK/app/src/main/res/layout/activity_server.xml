@@ -34,7 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/serverName"
-            android:paddingStart="5dp"/>
+            android:paddingStart="5dp"
+            android:paddingLeft="5dp"/>
 
     </LinearLayout>
         <ImageButton
@@ -43,7 +44,9 @@
             android:layout_height="wrap_content"
             android:background="@drawable/ic_bookmark_grey"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
             android:layout_marginTop="13dp"
             android:onClick="serverOnClick"/>
     </RelativeLayout>
@@ -179,20 +182,21 @@
                             android:visibility="gone"
                             android:textColor="@android:color/tab_indicator_text"
                             android:layout_marginEnd="10dp"
+                            android:layout_marginRight="10dp"
                             android:layout_gravity="center_vertical"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <Button
-                            android:id="@+id/serverUnblockCheck"
-                            android:text="@string/unblock"
-                            style="@style/buttons"
-                            android:minHeight="25dp"
-                            android:textAllCaps="false"
-                            android:padding="5dp"
-                            android:layout_marginTop="1dp"
-                            android:layout_marginBottom="1dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                    <Button
+                        android:id="@+id/serverUnblockCheck"
+                        android:text="@string/unblock"
+                        style="@style/buttons"
+                        android:minHeight="0dp"
+                        android:textAllCaps="false"
+                        android:padding="0dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="0dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 
