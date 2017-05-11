@@ -13,6 +13,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+
 public class MCrypt {
 
     static char[] HEX_CHARS = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
@@ -95,6 +96,7 @@ public class MCrypt {
     public static String bytesToHex(byte[] buf)
     {
         char[] chars = new char[2 * buf.length];
+
         for (int i = 0; i < buf.length; ++i)
         {
             chars[2 * i] = HEX_CHARS[(buf[i] & 0xF0) >>> 4];
@@ -102,6 +104,7 @@ public class MCrypt {
         }
         return new String(chars);
     }
+
 
 
     public static byte[] hexToBytes(String str) {

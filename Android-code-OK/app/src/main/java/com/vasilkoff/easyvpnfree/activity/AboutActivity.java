@@ -1,14 +1,19 @@
 package com.vasilkoff.easyvpnfree.activity;
 
 
-import android.bluetooth.BluetoothAdapter;
+//import android.bluetooth.BluetoothAdapter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.TextView;
 
 import com.vasilkoff.easyvpnfree.R;
+
+import java.util.Locale;
+
+import de.blinkt.openvpn.core.NativeUtils;
 
 public class AboutActivity extends BaseActivity {
 
@@ -24,12 +29,13 @@ public class AboutActivity extends BaseActivity {
 
             String deviceId = Settings.Secure.getString(this.getContentResolver(),
                     Settings.Secure.ANDROID_ID);
-            BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
-            String deviceName = myDevice.getName();
-
+            //BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+            //String deviceName = myDevice.getName();
+            String deviceName = String.format(Locale.US, "%d %s %s %s %s %s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE,
+                    NativeUtils.getNativeAPI(), Build.BRAND, Build.BOARD, Build.MODEL);
             TextView versionText = (TextView)findViewById(R.id.appVersion);
             versionText.setText(
-                    String.format("%s version %s build %d \nDevice Name: " + deviceName + "\nDevice ID: " + deviceId,
+                    String.format("%s version %s build %d \nBuild Info: " + deviceName + "\nDevice ID: " + deviceId,
                             appName,
                             versionName,
                             versionNumber

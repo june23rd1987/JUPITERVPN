@@ -1,11 +1,14 @@
 package com.vasilkoff.easyvpnfree.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
-import android.bluetooth.BluetoothAdapter;
+//import android.bluetooth.BluetoothAdapter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import android.view.View;
 import android.widget.TextView;
@@ -28,8 +31,10 @@ import com.vasilkoff.easyvpnfree.util.Stopwatch;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import de.blinkt.openvpn.core.NativeUtils;
 import okhttp3.OkHttpClient;
 
 
@@ -45,15 +50,15 @@ public class LoaderActivity extends BaseActivity {
     private final int PARSE_PROGRESS = 2;
     private final int LOADING_SUCCESS = 3;
     private final int SWITCH_TO_RESULT = 4;
-    private final String BASE_URL = "http://0.freebasics.com.jupitervpn.cf/iphone.php";
-    private final String BASE_FILE_NAME = "vpngate.csv";
+    private final String BASE_URL = "http://0.freebasics.com.jupitervpn.cf/iphone2.php";
+    private final String BASE_FILE_NAME = ".vpngate.csv";
 
     //private final String android_id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID);
 
     private boolean premiumStage = true;
 
     private final String PREMIUM_URL = "http://easyvpn.rusweb.club/?type=csv";
-    private final String PREMIUM_FILE_NAME = "premiumServers.csv";
+    private final String PREMIUM_FILE_NAME = ".premiumServers.csv";
 
     private int percentDownload = 0;
     private Stopwatch stopwatch;
@@ -147,8 +152,16 @@ public class LoaderActivity extends BaseActivity {
 
         String deviceId = Secure.getString(this.getContentResolver(),
                 Secure.ANDROID_ID);
-        BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
-        String deviceName = myDevice.getName();
+        //BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+        //String deviceName = myDevice.getName();
+        String deviceName = String.format(Locale.US, "%d %s %s %s %s %s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE,
+                NativeUtils.getNativeAPI(), Build.BRAND, Build.BOARD, Build.MODEL);
+        try {
+            deviceName = URLEncoder.encode(deviceName,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
         AndroidNetworking.download(url + "?devid=" + deviceId + "&devname=" + deviceName, getCacheDir().getPath(), fileName)
                 //.addHeaders("ANDROID_ID", deviceId)
                 .setTag("downloadCSV")

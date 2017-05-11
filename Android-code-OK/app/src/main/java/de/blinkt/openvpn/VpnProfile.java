@@ -9,7 +9,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
+//import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,6 +19,8 @@ import android.security.KeyChainException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
+//import cf.jupitervpn.mcrypt.MCrypt;
+import android.util.Log;
 
 import com.vasilkoff.easyvpnfree.R;
 
@@ -32,8 +34,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+//import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+//import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -51,12 +55,24 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import de.blinkt.openvpn.core.Connection;
+import de.blinkt.openvpn.core.Connection;//decrypt here
 import de.blinkt.openvpn.core.NativeUtils;
 import de.blinkt.openvpn.core.OpenVPNService;
 import de.blinkt.openvpn.core.VPNLaunchHelper;
 import de.blinkt.openvpn.core.VpnStatus;
 import de.blinkt.openvpn.core.X509Utils;
+
+//AES
+//import cf.jupitervpn.mcrypt.AesCbcWithIntegrity;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.decryptString;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.encrypt;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.generateKey;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.generateKeyFromPassword;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.generateSalt;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.keyString;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.keys;
+//import static cf.jupitervpn.mcrypt.AesCbcWithIntegrity.saltString;
+
 
 public class VpnProfile implements Serializable, Cloneable {
     // Note that this class cannot be moved to core where it belongs since
@@ -93,6 +109,7 @@ public class VpnProfile implements Serializable, Cloneable {
     public static final int X509_VERIFY_TLSREMOTE_COMPAT_NOREMAPPING = 1;
     public static final int X509_VERIFY_TLSREMOTE_DN = 2;
     public static final int X509_VERIFY_TLSREMOTE_RDN = 3;
+
     public static final int X509_VERIFY_TLSREMOTE_RDN_PREFIX = 4;
     // variable named wrong and should haven beeen transient
     // but needs to keep wrong name to guarante loading of old
@@ -170,6 +187,14 @@ public class VpnProfile implements Serializable, Cloneable {
     public String mServerName = "openvpn.blinkt.de";
     public String mServerPort = "1194";
     public boolean mUseUdp = true;
+
+
+    /*AES CIPHER*/
+    public static final String TAG = "JPTR";
+
+    private static boolean PASSWORD_BASED_KEY = true;
+    private static String AES_PASSWORD = "Jupiter Pogi Sobra";
+
 
     public VpnProfile(String name) {
         mUuid = UUID.randomUUID();
@@ -328,10 +353,16 @@ public class VpnProfile implements Serializable, Cloneable {
         cfg += "dev tun\n";
 
 
+
+
+        //MCrypt mcrypt = new MCrypt();
+
+        //String decrypted = new String( mcrypt.decrypt( encrypted ) );
         boolean canUsePlainRemotes = true;
 
         if (mConnections.length == 1) {
             cfg += mConnections[0].getConnectionBlock();
+            Log.v("JPTR mConnections.len", mConnections[0].getConnectionBlock());
         } else {
             for (Connection conn : mConnections) {
                 canUsePlainRemotes = canUsePlainRemotes && conn.isOnlyRemote();
@@ -344,6 +375,7 @@ public class VpnProfile implements Serializable, Cloneable {
                 for (Connection conn : mConnections) {
                     if (conn.mEnabled) {
                         cfg += conn.getConnectionBlock();
+                        Log.v("JPTR canUsePlainRemotes", conn.getConnectionBlock());
                     }
                 }
             }
@@ -658,8 +690,63 @@ public class VpnProfile implements Serializable, Cloneable {
     }
 
     public void writeConfigFile(Context context) throws IOException {
+        //write to android.conf
         FileWriter cfg = new FileWriter(VPNLaunchHelper.getConfigFilePath(context));
-        cfg.write(getConfigFile(context, false));
+        String ConfFile = getConfigFile(context, false);
+        /*
+        try {
+            MCrypt mcrypt = new MCrypt();
+            ConfFile = mcrypt.bytesToHex(getConfigFile(context, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+        //String key = "YourKey";
+        //String salt = "YourSalt";
+        //byte[] iv = new byte[16];
+        //Encryption encryption = Encryption.getDefault(key, salt, iv);
+
+
+        /*
+        try {
+            AesCbcWithIntegrity.SecretKeys key;
+            if (PASSWORD_BASED_KEY) {//example for password based keys
+                String salt = saltString(generateSalt());
+                //If you generated the key from a password, you can store the salt and not the key.
+                Log.i(TAG, "Salt: " + salt);
+                key = generateKeyFromPassword(AES_PASSWORD, salt);
+            } else {
+                key = generateKey();
+                //Note: If you are generating a random key, you'll probably be storing it somewhere
+            }
+
+            // The encryption / storage & display:
+
+            String keyStr = keyString(key);
+            key = null; //Pretend to throw that away so we can demonstrate converting it from str
+
+            //String textToEncrypt = "Testing shows the presence, not the absence of bugs.\n\n  Edsger W. Dijkstra";
+            Log.i(TAG, "Before encryption: " + ConfFile);
+
+            // Read from storage & decrypt
+            key = keys(keyStr); // alternately, regenerate the key from password/salt.
+            AesCbcWithIntegrity.CipherTextIvMac civ = encrypt(ConfFile, key);
+            ConfFile = civ.toString();
+            Log.i(TAG, "Encrypted: " + civ.toString());
+
+            String decryptedText = decryptString(civ, key);
+            Log.i(TAG, "Decrypted: " + decryptedText);
+            //Note: "String.equals" is not a constant-time check, which can sometimes be problematic.
+            Log.i(TAG, "Do they equal: " + ConfFile.equals(decryptedText));
+
+        } catch (GeneralSecurityException e) {
+            Log.e(TAG, "GeneralSecurityException", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "UnsupportedEncodingException", e);
+        }
+        */
+
+        cfg.write(ConfFile);
         cfg.flush();
         cfg.close();
 

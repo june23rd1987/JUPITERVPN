@@ -9,6 +9,9 @@ import android.text.TextUtils;
 
 import java.io.Serializable;
 
+import cf.jupitervpn.mcrypt.MCrypt;
+
+
 public class Connection implements Serializable, Cloneable {
     public String mServerName = "openvpn.blinkt.de";
     public String mServerPort = "1194";
@@ -25,9 +28,16 @@ public class Connection implements Serializable, Cloneable {
     public String getConnectionBlock() {
         String cfg = "";
 
+        MCrypt mcrypt = new MCrypt();
+
+        //String decrypted = new String( mcrypt.decrypt( encrypted ) );
         // Server Address
         cfg += "remote ";
-        cfg += mServerName;
+        try {
+            cfg += new String(mcrypt.decrypt(mServerName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         cfg += " ";
         cfg += mServerPort;
         if (mUseUdp)

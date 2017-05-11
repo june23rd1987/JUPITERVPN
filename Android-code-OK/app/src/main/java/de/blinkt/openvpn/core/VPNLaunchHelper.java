@@ -25,7 +25,7 @@ import de.blinkt.openvpn.VpnProfile;
 public class VPNLaunchHelper {
     private static final String MININONPIEVPN = "nopie_openvpn";
     private static final String MINIPIEVPN = "pie_openvpn";
-    private static final String OVPNCONFIGFILE = "android.conf";
+    private static final String OVPNCONFIGFILE = ".android.conf";
 
 
 
